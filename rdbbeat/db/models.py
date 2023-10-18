@@ -12,8 +12,7 @@ from celery import schedules
 from sqlalchemy import MetaData, func
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listen
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, class_mapper, foreign, relationship, remote
+from sqlalchemy.orm import Session, class_mapper, declarative_base, foreign, relationship, remote
 from sqlalchemy.sql import insert, select, update
 
 from rdbbeat.tzcrontab import TzAwareCrontab

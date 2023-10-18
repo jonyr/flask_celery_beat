@@ -1,7 +1,7 @@
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import engine_from_config, pool, text
 
 from rdbbeat.db.models import Base
 from rdbbeat.settings import DATABASE_URL
@@ -70,7 +70,7 @@ def run_migrations_online():
 
         # First ensure we have our scheduler schema available as all of these migrations will live
         # within this schema.
-        connection.execute("CREATE SCHEMA IF NOT EXISTS scheduler")
+        connection.execute(text("CREATE SCHEMA IF NOT EXISTS scheduler"))
 
         with context.begin_transaction():
             context.run_migrations()
