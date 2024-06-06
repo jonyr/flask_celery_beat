@@ -29,6 +29,7 @@ setup(
     install_requires=[
         "celery~=5.2",
         "sqlalchemy",
+        "SQLAlchemy-Utils",
         "alembic",
         "pydantic",
         "python-dotenv",
