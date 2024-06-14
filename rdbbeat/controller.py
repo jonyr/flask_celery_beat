@@ -13,7 +13,9 @@ from rdbbeat.db.models import CrontabSchedule, PeriodicTask
 from rdbbeat.exceptions import PeriodicTaskNotFound
 
 
-def get_crontab_schedule(session: Session, schedule: Schedule) -> CrontabSchedule:
+def get_crontab_schedule(
+    session: Session, schedule: Schedule
+) -> CrontabSchedule:
     crontab = (
         session.query(CrontabSchedule)
         .where(
@@ -28,7 +30,7 @@ def get_crontab_schedule(session: Session, schedule: Schedule) -> CrontabSchedul
         )
         .one_or_none()
     )
-    return crontab or CrontabSchedule(**schedule.dict())
+    return crontab or CrontabSchedule(**schedule.model_dump())
 
 
 def schedule_task(
@@ -42,7 +44,9 @@ def schedule_task(
     """
     Schedule a task by adding a periodic task entry.
     """
-    crontab = get_crontab_schedule(session=session, schedule=scheduled_task.schedule)
+    crontab = get_crontab_schedule(
+        session=session, schedule=scheduled_task.schedule
+    )
     task = PeriodicTask(
         crontab=crontab,
         name=scheduled_task.name,
@@ -66,7 +70,11 @@ def update_task_enabled_status(
     Update task enabled status (if task is enabled or disabled).
     """
     try:
-        task = session.query(PeriodicTask).filter(PeriodicTask.id == periodic_task_id).one()
+        task = (
+            session.query(PeriodicTask)
+            .filter(PeriodicTask.id == periodic_task_id)
+            .one()
+        )
         task.enabled = enabled_status  # type: ignore [assignment]
         session.add(task)
 
@@ -85,7 +93,11 @@ def update_task(
     Update the details of a task including the crontab schedule
     """
     try:
-        task = session.query(PeriodicTask).filter(PeriodicTask.id == periodic_task_id).one()
+        task = (
+            session.query(PeriodicTask)
+            .filter(PeriodicTask.id == periodic_task_id)
+            .one()
+        )
 
         task.crontab = get_crontab_schedule(session, scheduled_task.schedule)
         task.name = scheduled_task.name  # type: ignore [assignment]
@@ -98,14 +110,22 @@ def update_task(
     return task
 
 
-def is_crontab_used(session: Session, crontab_schedule: CrontabSchedule) -> bool:
-    schedules = session.query(PeriodicTask).filter_by(crontab=crontab_schedule).all()
+def is_crontab_used(
+    session: Session, crontab_schedule: CrontabSchedule
+) -> bool:
+    schedules = (
+        session.query(PeriodicTask).filter_by(crontab=crontab_schedule).all()
+    )
     return True if schedules else False
 
 
 def delete_task(session: Session, periodic_task_id: int) -> PeriodicTask:
     try:
-        task = session.query(PeriodicTask).where(PeriodicTask.id == periodic_task_id).one()
+        task = (
+            session.query(PeriodicTask)
+            .where(PeriodicTask.id == periodic_task_id)
+            .one()
+        )
         session.delete(task)
         session.flush()
         if not is_crontab_used(session, task.crontab):
